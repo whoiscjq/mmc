@@ -36,3 +36,11 @@ Pearson系数
 ## 4.参考：
 ### 相关性分析：
 ![image](https://github.com/whoiscjq/mmc/assets/108521058/7e366423-a23e-408a-a26a-92fec361ea48)
+
+
+##问题三符号表
+对于编号为i的单品，其预测的销售量值为 $N_{purchase}^i$, 标准误为 $SE_{N_{purchase}}^i$;
+其预测的售价值为 $\rho^i$, 标准误为 $SE_{\rho}^i$;
+其预测的批发价值为 $C^i$, 标准误为 $SE_{C}^i$;
+其近期的损耗率数据$l^i$
+预期的获利量$P_{exp}^i$
