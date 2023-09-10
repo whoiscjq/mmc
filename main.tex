@@ -1,0 +1,640 @@
+% !Mode:: "TeX:UTF-8"
+% !TEX program  = xelatex
+
+%\documentclass{cumcmthesis}
+
+\documentclass[withoutpreface,bwprint]{cumcmthesis} %去掉封面与编号页，电子版提交的时候使用。
+\usepackage{tikz}
+\usepackage{svg}
+\usepackage{graphicx}
+\usetikzlibrary{shapes,arrows}
+\usepackage[framemethod=TikZ]{mdframed}
+\usepackage{url}   % 网页链接
+\usepackage{subcaption} % 子标题
+\title{基于***的蔬菜类商品自动定价与补货决策}
+\tihao{C}
+\baominghao{****}
+\schoolname{上海交通大学}
+\membera{ }
+\memberb{ }
+\memberc{ }
+\supervisor{ }
+\yearinput{2020}
+\monthinput{08}
+\dayinput{22}
+
+\begin{document}
+
+\maketitle
+ \begin{abstract}
+摘要
+
+% \begin{mdframed} [%
+% 	roundcorner=5pt,
+% 	linecolor=gray!50,
+% 	outerlinewidth=0.5pt,
+% 	middlelinewidth=0.3pt, backgroundcolor=gray!2,
+% innertopmargin=\topskip, frametitle={2020 年建模比赛格式变化说明},
+% frametitlefont= \bfseries,frametitlerule=true,frametitlealignment =\raggedright\noindent,
+% frametitlerulewidth=.5pt, frametitlebackgroundcolor=gray!2,]
+% 今年的格式变化主要就是三个地方，如下：
+% \begin{enumerate}
+% \item 论文第一页为承诺书，\textbf{\color{red}内容进行了调整}。
+
+% \item 编号页格式进行了格式调整。
+
+% \item 这是19年调整了，这里延续说明下。论文正文（\textbf{\color{red}不要目录}，尽量控制在20页以内）；正文之后是论文附录（页数不限）。
+
+% \end{enumerate}
+
+% \end{mdframed}
+
+\end{abstract}
+
+%\newpage
+
+\section{问题重述}
+
+\subsection{问题背景}
+随着电商时代的到来与人们消费习惯的转变，各类中小型生鲜商超需重新思考进货方式与定价策略。
+
+作为居民最常购买也最具代表性的生鲜种类，蔬菜类商品的保鲜期较短，品质随销售时间折损，大部分品种如当日未售出，隔日就无法再售，故而商家每日进行补货与定价。
+
+在较短的销售周期下，定价与进货方式策略主要依赖商家的经验，产生波动性的概率较大，由此我们依据一年内销售数据建立模型给出进货与定价策略，给与商家进行参考。
+
+\subsection{问题的提出}
+\subsubsection{销售量分析}
+进货与定价策略与基于销售量分析的市场需求分析紧密相连，分别从供给与需求侧来讲，销售量与时间关系和各品类与单品的组合关系有密切关联。
+    
+附件 2 给出了该商超 2020 年 7 月 1 日至 2023 年 6 月 30 日各商品的销售流水明细。
+
+由此提出
+\begin{itemize}
+    \item \textbf{问题一:}统计分析每日销售价格与销售量，建立模型分析其时间维度的分布规律与各单品、品类的销售关联。
+\end{itemize}
+
+\subsubsection{品类进货与定价策略}
+由于商超销售的蔬菜品种众多、产地不尽相同，而蔬菜的进货交易时间通常在凌晨，为此商家须在不确切知道具体单品和进货价格的情况下，做出当日各蔬菜品类的补货决策。
+
+在进货后，商超采用“成本加成定价”方法做出定价。
+
+附件 3 分别给出了该商超 2020 年 7 月 1 日至 2023 年 6 月 30 日各商品批发价格数据；附件 4 给出了各商品近期的损耗率数据。
+
+由此提出
+\begin{itemize}
+    \item \textbf{问题二:}基于据问题一对销售量的分布规律的了解，建立模型研究销售量与进货量、定价之间的关系，参考近期商品的损耗率，进而优化针对品类的一周进货与定价策略。
+\end{itemize}
+
+\subsubsection{单品进货与定价策略}
+因蔬菜类商品的销售空间有限，商超要求可售单品总数控制在27-33个，且各单品订购量满足最小陈列量 2.5 千克。
+
+附件 3 中提供了2023年 6 月 24-30 日的可售品种。
+
+由此提出
+\begin{itemize}
+    \item \textbf{问题三:}在问题二针对品类决策的模型的基础上建立针对单品决策的模型，加入单品总数与单品订购量的限制，满足各品类均衡的需求。
+\end{itemize}
+
+\subsubsection{开放性讨论}
+由于提供数据集中在销售量方向，而如天气、地域等其他因素同样会对进货与定价策略产生影响，由此产生
+\begin{itemize}
+    \item \textbf{问题四:}在题中所给数据之外，思考其他数据对商超进行进货与定价策略的影响。
+\end{itemize}
+
+
+
+
+
+\section{问题分析}
+通过对题目提供附件的综合分析可知，本题是一个针对蔬菜类商品的进货与定价决策问题。我们需要根据过去三年的销售明细与批发价格、近期商品种类与损耗情况做出\textbf{使商超期望收益最大}的决策。
+
+\begin{enumerate}
+    \item \textbf{问题一：}各品类与单品的销售量自身的变化规律可由附件二提供的过去三年销售明细相关数据得到，具体体现为时间维度的数据挖掘。
+    
+    各品类与单品销售量的相互关系可由Pearson系数等指标描述。
+    \item \textbf{问题二：}通过附件二中过去三年的销售明细，在理解销售量自身变化规律的基础上拟合销售量与定价的关系。
+    
+    制定进货与定价策略时，引入销售量时间变化规律和定价规律，考虑两部分中批发价的可知性不同，对其分别建立优化利润模型。
+    \item \textbf{问题三：}根据2023年6月24日-30日的可售商品信息筛选出备选清单，利用
+    \item \textbf{问题四：}
+\end{enumerate}
+
+
+\section{问题假设}
+\begin{enumerate}
+    \item 损耗产品为购进后当天未售出的蔬菜；
+    \item 近期损耗率假设为最近一月内（2023年6月1日-6月30日）损耗率的均值；
+    \item 当日各单品首次出售的价格为其原价；
+    \item 因运输损坏的商品打折售卖；
+    \item 根据题目所给信息，只考虑以往销售量与当前售价对销售量的影响；
+    \item 进货时无法批发金未知，定价时批发价已知；
+    \item 假设2023年6月24日至30日出售过的品种为7月1日可售品种
+\end{enumerate}
+
+\section{符号说明}
+\begin{table}[!htbp]
+    \caption{符号说明}\label{tab:001} \centering
+    \begin{tabular}{ccccc}
+        \toprule[1.5pt]
+        符号 & 符号描述\\
+        \midrule[1pt]
+        $N_{purchase}$ & 进货量 \\
+        $C$ & 批发价 \\
+        $l$ & 损耗率 \\
+        $N_{sold}$ & 销售量 \\
+        $r_{profit}$ & 利润率 \\
+        $\rho$ & 售价 \\
+        \bottomrule[1.5pt]
+    \end{tabular}
+\end{table}
+\section{模型建立与求解}
+
+\subsection{数据处理}
+\subsubsection{异常值处理}
+    题目所给附件中的数据来自2020-2023年，这三年收到疫情的影响，以及蔬菜类商品自身较大的波动性，销售量及销售价格存在部分异常偏大或偏小。
+    
+    首先通过频率直方图直观观察2020年-2023年所有销售量、销售价格和批发价格的分布情况。发现销售量在0.5kg和1.5kg附近出现两个峰值，这可能是由疫情的非自然因素导致的。销售价格同样呈现双峰值的\textbf{非正态分布趋}势。而批发价格呈现典型的钟形，可以近似认为满足正态分布。
+% 如图**所示：
+    
+    故而我们通过构建\textbf{箱线图}的方法清洗附件二中的销售量与销售价格数据，去除其异常数据。
+    
+\subsubsection{隐藏数据挖掘}。附件二销售明细中部分商品被退货或打折出售，由退货商品信息重新构建当日真实的销售量，由打折商品信息推算当日真实销售价格与商家折扣习惯。
+    \begin{align}
+            \text{销售量} &= \text{售出量} - \text{退货量} \notag \\
+        \text{折扣} &= \frac{\text{打折价}}{\text{原价}}
+    \end{align}
+% 退货占比图，折扣习惯图
+    
+    由附件三中的商品近期损耗率结合销售明细，根据我们的假设1（损耗商品均为购进未售出的蔬菜）和假设2（近期损耗率假设为最近一月内损耗率的均值）可近似模拟出最近一月该商超各蔬菜单品的进货量。
+    \begin{equation}
+        \text{进货量} = \frac{\text{销售量}}{\text{损耗率}}
+    \end{equation}
+% 一个月进货量与销量图
+
+
+
+% \begin{figure}[htbp]
+%   \centering
+%   \begin{subfigure}{0.3\linewidth}
+%     \centering
+%     \includegraphics[width=\linewidth]{figures/in_sale.pdf}
+%     \caption{图像1}
+%   \end{subfigure}
+%   \begin{subfigure}{0.3\linewidth}
+%     \centering
+%     \includegraphics[width=\linewidth]{figures/in_sale.pdf}
+%     \caption{图像2}
+%   \end{subfigure}
+%   \begin{subfigure}{0.3\linewidth}
+%     \centering
+%     \includegraphics[width=\linewidth]{figures/in_sale.pdf}
+%     \caption{图像3}
+%   \end{subfigure}
+%   \caption{三张PDF图像的并排显示}
+% \end{figure}
+
+
+
+
+\subsection{问题一：销售量分析}
+\subsubsection{时间维度的销售量变化规律}
+\begin{figure}[!h]
+    \centering
+    \includegraphics[width=.7\textwidth]{figures/sale_num_rule.jpg}
+    \caption{销售量变化规律维度表}
+    \label{fig:N_purchase_rule}
+\end{figure}
+%上海青or其他
+\begin{enumerate}
+    \item \textbf{季节性：}依据蔬菜的季节性生长特点，我们绘制不同品类多个单品的三年销售量折线图图，发现其反映出不同程度的季节性：
+
+进而对同品类的蔬菜销售量进行整合统计（见图），发现其一般性的季节规律：
+% \begin{figure}[!h]
+%     \centering
+%     \includegraphics{figures/your_image.pdf}
+%     \caption{销售量变化规律维度表}
+%     \label{fig:N_purchase_rule}
+% \end{figure}
+    \item \textbf{周末效应：}根据城市居民的生活习惯观察，周末期间购买蔬菜的数量明显高于工作日，这一点也体现在了历史数据中。
+    
+    \item \textbf{}
+\end{enumerate}
+
+
+
+\begin{figure}[!h]
+    \centering
+    \includegraphics[width=.95\textwidth]{figures/saled_all.pdf}
+    \caption{三年销售量}
+    \label{fig:3years_saled}
+\end{figure}
+
+\subsubsection{各品类销售量的相互关系}
+\begin{figure}[!h]
+    \centering
+    \includegraphics[width=\textwidth]{figures/sales_pearson.png}
+    \caption{各品类销售量的pearson系数热力图}
+    \label{fig:3years_saled}
+\end{figure}
+\subsection{问题二：以优化利润为目标的进货定价模型}
+    \begin{figure}[!h]
+    \centering
+    \includegraphics[width=0.95\textwidth]{figures/q2_model.jpg}
+    \caption{：以优化利润为目标的进货定价模型流程图}
+    \label{fig:q2_model}
+\end{figure}
+
+\subsubsection{销售量与定价的关系}
+\begin{enumerate}
+    \item 依据生活经验，销售量与定价应呈现此消彼长的\textbf{反比}关系，**品类的历史销售明细也呈现此趋势。
+%此处有图
+
+    \item 对于\textbf{正态性不明显}的销售量与定价数据，我们采用\textbf{斯皮尔曼秩相关系数}（Spearman's Rank Correlation Coefficient）定量描述其相关性，见图\ref{fig:sale_sold_pearson}。
+    
+    Spearman相关系数是一种用于衡量两个变量之间的非线性关系的统计方法。与皮尔逊相关系数不同，Spearman相关系数基于变量的秩次而不是原始数据的值来计算相关性。计算过程详见附录。
+    \begin{figure}[!h]
+    \centering
+    \includegraphics[width=0.5\textwidth]{figures/Spearman_rule.jpg}
+    \caption{Spearman系数}
+    \label{fig:Spearman_rule}
+\end{figure}
+
+    \item 
+
+\end{enumerate}
+
+%这张图要改
+\begin{figure}[!h]
+    \centering
+    \includegraphics[width=\textwidth]{figures/sale_sold_pearson.png}
+    \caption{各品类销售量与售价的pe+}
+    \label{fig:sale_sold_pearson}
+\end{figure}
+\subsubsection{基于定价的销售量预测}
+\begin{enumerate}
+    \item \textbf{线性拟合：}
+    假设销售量$N_{purchase}$与售价$\rho$存在线性关系：
+    \begin{equation}
+        N_{purchase} = k \rho + b 
+    \label{eq:purchase_price}
+    \end{equation}
+    
+    依据销售量自身变化规律，取三年内所有\textbf{周末}的销售量数与定价数据，使用\textbf{最小二乘法}拟合销售量：
+    $\rho_i,N_{purchase}$分别表示销售量与售价的历史数据
+\begin{equation}
+\begin{aligned}
+X &= \begin{bmatrix}
+    \rho_1 & 1 \\
+    \rho_2 & 1 \\
+    ... & 1 \\
+    \rho_n & 1 
+\end{bmatrix} , \quad
+Y &= \begin{bmatrix}
+N_{purchase_1}\\
+N_{purchase_2}\\
+...\\
+N_{purchase_n}
+\end{bmatrix}
+\end{aligned}
+\label{eq:X_Y}
+\end{equation}
+ 根据最小二乘法解析解\cite{min2*}与公式 \textbf{\ref{eq:X_Y}} 得到
+\begin{equation}
+\begin{bmatrix}
+k&b
+\end{bmatrix} 
+=(X^TX)^{-1}X^TY 
+    \label{eq:purchase_price}
+    \end{equation}
+    
+    **类蔬菜三年内销量与定价线性拟合情况如图\textbf{\ref{}}
+
+
+    
+    \item \textbf{非线性拟合：}根据\cite{}，销售量在售价极低或极高时应随售价波动放缓，该趋势与Sigmoid曲线近似(如图\ref{})，故而假设销售量$N_{purchase}$与售价$\rho$存在非线性关系：
+    \begin{equation}
+    \begin{aligned}
+        S(\rho) &= \frac{1}{1+e^{-\rho}}\\
+        N_{purchase} &= kS({\rho}) + b
+    \end{aligned}
+    \end{equation}
+     **类蔬菜三年内销量与定价非线性拟合情况如图\textbf{\ref{}}
+\end{enumerate}
+    
+ \subsubsection{基于季节性时间序列分析(SARIMA)的销售量预测}
+    根据\textbf{5.2.1}对销售量自身变化规律的观察，蔬菜类商品销售量呈现明显的时间特征，每年与每周的规律性销售量起伏使基于历史数据的季节性时间序列分析成为可能。
+    
+    由此我们具体使用\textbf{季节性差分自回归移动平均(Seasonal Integrated Autoregressive Moving Average，通常缩写为SARIMA模型)}，捕捉时间序列数据中的趋势、季节性和噪声成分，以7天为季节性变化周期预测销售量。
+    
+    \begin{enumerate}
+        \item \textbf{对数据进行季节性差分：}计算相邻季节性周期内的差值。对于本数据来说，具体为计算每周每日与上一周同日的差值。
+        \item \textbf{平稳性ADF检验：}对进行过季节性差分的数据进行平稳检验（见图\ref{}）
+    \end{enumerate}
+    SARIMA模型通常由以下三个组成部分表示：
+
+SAR（季节性自回归）部分：表示当前时间点的观测值与过去一个季节性周期（通常是一年或一个季度）之前的观测值之间的关系。
+
+SMA（季节性移动平均）部分：表示当前时间点的观测值与过去一个季节性周期之前的噪声项（残差）之间的关系。
+
+季节性差分（Seasonal Differencing）：类似于标准ARIMA中的差分操作，用于使数据平稳化。季节性差分通常是指将数据按照季节性周期进行差分操作，以去除季节性趋势。
+
+ \subsubsection{基于季节性时间序列分析(SARIMA)的批发价预测}
+ 
+ \subsubsection{最优化利润进货模型}
+ $b=\sum_{i}(k\rho_i-N_{purchase})/N$
+ 
+ %提纲：引入销售量对时间的函数， 引入随机波动， 解方程， 引入函数的置信区间
+在前文中，我们已经建立了基于定价的销售量预测方法，通过这一方法，我们能够了解销售量在指定日期关于售价的函数关系。然而，在实际情况中，销售量和批发价等因素具有一定的波动性和不确定性，同时我们的模型也存在一定的误差。为了更全面地考虑这些因素，我们引入随机变量，将原始问题转化为一个随机优化问题。
+
+在不考虑销售量和批发价的预测误差的情况下，我们通过以下优化问题来求解进货量：
+ \begin{align}
+    \max_{r_{profit},N_{purchase}}&N_{sold}(1+r_{profit})C-N_{purchase}C\\
+    s.t.& N_{sold} \leq N_{purchase}\\
+        &N_sold=kk\rho+bb\\%?
+        & \rho=(1+r_{profit})C  
+\end{align}
+这个问题的解决将为我们提供进货量的基准值。然而，为了更准确地反映实际情况，我们考虑了销售量和批发价的预测误差，以及批发价和销售量的波动性。
+\begin{align}
+    \max_{r_{profit},N_{purchase}}\ &\overline{N_{sold}}(1+r_{profit})\overline{C}-N_{purchase}\overline{C}\\
+    s.t.& \overline{\overline{N_{sold}}} \leq N_{purchase}\\
+    &\rho=(1+r_{profit})\overline{C}\\
+    &\overline{C}=C_{expect}+E (E\sim N(0,\sigma_1))\\
+    &\overline{\overline{N_{sold}}}=kk(\rho)+b+Z (Z \sim N(0,\sigma_2))
+\end{align}
+上述式子中的$\sigma_1$为相应批发价的ARIMA模型的标准误，而$\sigma_2$则由下式给出：
+\begin{equation*}
+    \sigma_2=\sqrt{\frac{1}{n-1}\sum_t(kk\rho_t+bb-M_t)^2}
+\end{equation*}
+
+这个问题的解决将为我们提供进货量的基准值。然而，为了更准确地反映实际情况，我们考虑了销售量和批发价的预测误差，以及批发价和销售量的波动性。
+
+在随机优化问题中，我们希望最大化期望利润，但同时考虑到批发价和销售量的不确定性。因此，我们引入了超参数 $\beta_1$ 和 $\beta_2$，这些超参数可以反映商家对相关风险的容忍度。具体来说，我们的随机优化问题可以表示为：
+\begin{align}
+    \max_{r_{profit},N_{purchase}}\min_{\epsilon,\zeta}&N_{sold}(\rho )(1+r_{profit})\overline{C}-N_{purchase}\overline{C}\\
+    s.t.& N_{sold} \leq N_{purchase}\\
+    &\rho=(1+r_{profit})\overline{C}\\
+    &\overline{C}=C_{expect}+\epsilon\\
+    &\overline{N_{sold}}=kk(\rho)+bb\zeta\\
+    -\beta_1&\sigma_1 \leq \epsilon \leq \beta_1\sigma_1\\
+    -\beta_2&\sigma_2 \leq \zeta\leq \beta_2\sigma_2
+\end{align}
+ \subsubsection{最优化利润定价模型}
+%  根据经济学基本原理，对于蔬菜这一类的一般品，其售价与销售量呈负相关关系。因此，我们不妨用斜率小于0的直线在表示一定范围内售价与销售量之间的关系。可以假定地区内的经济状况在三年内无太大变化，因此可以认为该直线在不同天数下的斜率保持恒定，即对店家加减售价的容忍度不变，而由于星期产生的需求变化则反应在截距上。
+在定价时，我们已然知道批发价的确切值，于是上文问题
+ 
+ 
+ \begin{align}
+    \max_{r_{profit}}&M(\rho)(1+r_{profit})C-N_{purchase}\overline{C}\\
+    s.t.&\ M \leq N_{purchase}\\
+        & \rho=(1+r_{profit})C \\
+\end{align}
+
+\subsection{问题三}
+提纲：{讨论数据意义，解释 $P_{expected}^i$,解释最终的排列方法}
+\subsubsection{问题简述？}
+与前文类似，我们基于2023年6月4日至6月24日的数据，建立了可出售品种的销售量、售价和批发价与时间相关的ARIMA模型。为了方便后续的叙述，我们引入了相关变量的符号表示。对于编号为i的单品，其预测销售量为 $N_{sold}^i$，标准误差为 $SE_{sold}^i$；预测售价为 $\rho^i$，标准误差为 $SE_{\rho}^i$；预测批发价为 $C^i$，标准误差为 $SE_{C}^i$；其近期的损耗率数据为 $l^i$。
+
+我们通过这些预测值和标准误差来计算预期的获利量 $P_{expected}^i$，计算方法由下述式子给出:
+\begin{equation}
+    P_{expected}^i=(N_{sold}^i+\beta_{N_{sold}}SE_{N_{sold}}^i)(\rho^i+\beta_{\rho}SE_{\rho}^i)-\frac{1}{1-l^i}(C^i-\beta_{C}SE_{C}^i)(N_{sold}^i+\beta_{N_{sold}}^iSE_{N_{sold}}^i)
+\end{equation}
+
+其中，$\beta_{N_{purchase}}$、$\beta_{\rho}$和$\beta_{C}$是由店家设定的超参数，用于衡量店家对相关风险的容忍程度。当这些超参数为正时，表示店家愿意承担风险以追求更高的利润，而当超参数为负时，则表示店家愿意牺牲潜在的利益以确保收益的稳定性。
+
+然而，在继续探讨$P_{exp}^i$与这三个超参数之间的关系之前，我们必须首先解决一个复杂的问题，即在统计区间内，某些单品并未进行销售，因此缺乏相关数据支持。
+\subsubsection{缺失数据处理？}
+% $\rho^i$和$SE_{\rho}^i$即取单品i在期间非缺省售价的平均值和方差；$C^i$和$SE_{C}^i$即取单品i在期间非缺省批发价的平均值和方差；$N_{sold}^i$和$SE_{sold}^i$即取单品i在期间非缺省销售量的平均值和方差,但其7月1日的预测值由经标准化处理的品类ARIMA模型预测值乘以$N_{sold}^i$得到。下面给出公式：
+
+在问题二中，我们使用ARIMA模型进行各品类当日进货价格及销量的预测。但是在问题三中，当预测对象从品类变为了更细分的单品后，ARIMA模型将难以在一些单品上继续适用，其原因在于数据的不足：2023年6月24日至6月30日所售的单品中，绝大多数单品并没有在期间的每一天都进货并销售，一些单品甚至只有1天或2天有销售额，于是销量数据与价格数据在许多单日上是空缺的。由于其不满足ARIMA模型对数据时间序列连续性的要求，因此在预测单品的销售量、售价和批发价时，需要采用其它的策略来实现预测。
+
+对于销售量，我们采用通过对单品所属品类的销量走势预测，从而估测单品销量走势的策略。假设1)单品$i$的销量走势与其所属品类$j$的销量走势一致；2)单品的周均销售量均值$N_{sold}^i$与标准误差$SE_{sold}^i$在短期内保持一致。从问题二的研究中已经知道，一个品类的销售量是以周为单位波动的，于是能通过品类$j$在7月1日至7月7日的预测销售量$\{N_{sold}^{j,1}, \dots, N_{sold}^{j, 7}\}$，得到周均预测销售量$\overline{N}_{sold}^j$及对应的7月1日品类预测销售系数$N_{sold}^{j,1}/\overline{N}_{sold}^j$。其次，可以统计单品$i$过去七天的历史平均销售量$\mu^i_{sold}$和历史标准误差$s^i_{sold}$，估算出次日的预测销售量$N^i_{sold} = \mu^i_{sold} \cdot N_{sold}^{j,1}/\overline{N}_{sold}^j$；预测标准误差$SE^i_{sold}=s^i_{sold}$。
+
+对于售价和批发价，可以类似地求出$\mu^i_{\rho}$、$s^i_{\rho}$、$\mu^i_{C}$、$s^i_{C}$。由于售价和批发价没有明显以周为周期的季节性，因而可以直接用近期的均值来估算，即$\rho^i = \mu^i_{\rho}$，$SE^i_\rho = s^i_\rho$，$C^i = \mu^i_C$，$SE^i_C = s^i_C$。
+
+\begin{align}
+    \textbf{设序列中非缺省值为:}
+\end{align}
+\subsubsection{选取方法以及实验？}
+在给定上述超参数的情况下，我们可以进一步说明选取陈列商品的方法：
+\begin{enumerate}
+    \item  首先，我们筛选掉所有不满足条件 $\frac{1}{1-l^i}(N_{sold}^i+\beta_{N_{sold}}^iSE_{N_{sold}}^i)>2.5$ 的单品。
+    \item 接着，我们计算所有单品的预期获利量 $P_{exp}^i$ 并按照大小进行排序。
+    \item 我们选择前27个单品作为陈列商品。
+    \item 如果仍然存在单品满足条件 $P_{exp}^i>0$，则继续选择，直到没有单品的 $P_{exp}^i$ 大于0或所选单品的总数达到33个。
+\end{enumerate}
+
+在解决了上述问题之后，我们将对超参数的影响进行验证。表中列出了当超参数 $\beta_{N_{purchase}}$、$\beta_{\rho}$ 和 $\beta_{C}$ 分别为 (0,0,0)、(1,1,1)、(-1,-1,-1) 和 (1,0,1) 时的结果。)
+\section{模型检验}
+
+
+
+
+\section{结果分析}
+
+\section{模型的进一步讨论}
+\begin{enumerate}
+    \item 进货量  统计售罄
+    \item 天气
+    \item 不同销售周期
+\end{enumerate}
+\section{问题四：优化思路}
+
+%参考文献
+\begin{thebibliography}{9}%宽度9
+    \bibitem[1]{min2*}最小二乘法
+    \newblock \url{https://www.bing.com/search?q=最小二乘法&form=ANNTH1&refig=e931dc32296c4e048a306d3e28779e9d}
+\end{thebibliography}
+
+\newpage
+%附录
+\begin{appendices}
+\section{.}
+\end{appendices}
+
+
+
+% \section{图片}
+% \begin{figure}[!h]
+%     \centering
+%     \includegraphics[width=.6\textwidth]{smokeblk}
+%     \caption{电路图}
+%     \label{fig:circuit-diagram}
+% \end{figure}
+
+
+% \begin{figure}
+%     \centering
+%     \begin{minipage}[c]{0.3\textwidth}
+%         \centering
+%         \includegraphics[width=0.95\textwidth]{f1}
+%         \subcaption{流程图}
+%         \label{fig:sample-figure-a}
+%     \end{minipage}
+%     \begin{minipage}[c]{0.3\textwidth}
+%         \centering
+%         \includegraphics[width=0.95\textwidth]{f1}
+%         \subcaption{流程图}
+%         \label{fig:sample-figure-b}
+%     \end{minipage}
+%     \begin{minipage}[c]{0.3\textwidth}
+%         \centering
+%         \includegraphics[width=0.95\textwidth]{f1}
+%         \subcaption{流程图}
+%         \label{fig:sample-figure-c}
+%     \end{minipage}
+%     \caption{多图并排示例}
+%     \label{fig:sample-figure}
+% \end{figure}
+
+% \begin{figure}
+%     \centering
+%     \begin{minipage}[c]{0.48\textwidth}
+%         \centering
+%         \includegraphics[height=0.2\textheight]{cat}
+%         \subcaption{一只猫}
+%     \end{minipage}
+%     \begin{minipage}[c]{0.48\textwidth}
+%         \centering
+%         \includegraphics[height=0.2\textheight]{smokeblk}
+%         \subcaption{电路图}
+%     \end{minipage}
+%     \caption{多图并排示例}
+% \end{figure}
+
+
+\section{公式}
+
+数学建模必然涉及不少数学公式的使用。下面简单介绍一个可能用得上的数学环境。
+
+首先是行内公式，例如 $ \theta $ 是角度。行内公式使用 \verb|$  $| 包裹。
+
+行间公式不需要编号的可以使用 \verb|\[  \]| 包裹，例如
+\[
+E=mc^2
+\]
+其中 $ E $ 是能量，$ m $ 是质量，$ c $ 是光速。
+
+如果希望某个公式带编号，并且在后文中引用可以参考下面的写法：
+\begin{equation}
+E=mc^2
+\label{eq:energy}
+\end{equation}
+式\cref{eq:energy}是质能方程。
+
+多行公式有时候希望能够在特定的位置对齐，以下是其中一种处理方法。
+\begin{align}
+P & = UI \\
+& = I^2R
+\end{align}
+\verb|&| 是对齐的位置， \verb|&| 可以有多个，但是每行的个数要相同。
+
+矩阵的输入也不难。
+\[
+\mathbf{X} = \left(
+    \begin{array}{cccc}
+    x_{11} & x_{12} & \ldots & x_{1n}\\
+    x_{21} & x_{22} & \ldots & x_{2n}\\
+    \vdots & \vdots & \ddots & \vdots\\
+    x_{n1} & x_{n2} & \ldots & x_{nn}\\
+    \end{array} \right)
+\]
+
+分段函数这些可以用 \verb|case| 环境，但是它要放在数学环境里面。
+\[
+f(x) =
+    \begin{cases}
+        0 &  x \text{为无理数} ,\\
+        1 &  x \text{为有理数} .
+    \end{cases}
+\]
+在数学环境里面，字体用的是数学字体，一般与正文字体不同。假如要公式里面有个别文字，则需要把这部分放在 \verb|text| 环境里面，即 \verb|\text{文本环境}| 。
+
+公式中个别需要加粗的字母可以用 \verb|$\bm{math symbol}$| 。如 $ \alpha a\bm{\alpha a} $ 。
+
+以上仅简单介绍了基础的使用，对于更复杂的需求，可以阅读相关的宏包手册，如 \href{http://texdoc.net/texmf-dist/doc/latex/amsmath/amsldoc.pdf}{amsmath}。
+
+希腊字母这些如果不熟悉，可以去查找符号文件 \href{http://mirrors.ctan.org/info/symbols/comprehensive/symbols-a4.pdf}{symbols-a4.pdf} ，也可以去 \href{http://detexify.kirelabs.org/classify.html}{detexify} 网站手写识别。另外还有数学公式识别软件 \href{https://mathpix.com/}{mathpix} 。
+
+下面简单介绍一下定理、证明等环境的使用。
+\begin{definition}
+    定义环境
+    \label{def:nosense}
+\end{definition}
+\cref{def:nosense}除了告诉你怎么使用这个环境以外，没有什么其它的意义。
+
+除了 definition 环境，还可以使用 theorem 、lemma、corollary、assumption、conjecture、axiom、principle、problem、example、proof、solution 这些环境，根据论文的实际需求合理使用。
+
+
+\begin{theorem}
+    这是一个定理。
+    \label{thm:example}
+\end{theorem}
+
+
+由\cref{thm:example}我们知道了定理环境的使用。
+
+\begin{lemma}
+    这是一个引理。
+    \label{lem:example}
+\end{lemma}
+由\cref{lem:example}我们知道了引理环境的使用。
+
+\begin{corollary}
+    这是一个推论。
+    \label{cor:example}
+\end{corollary}
+由\cref{cor:example}我们知道了推论环境的使用。
+
+\begin{assumption}
+    这是一个假设。
+    \label{asu:example}
+\end{assumption}
+由\cref{asu:example}我们知道了假设环境的使用。
+
+\begin{conjecture}
+    这是一个猜想。
+    \label{con:example}
+\end{conjecture}
+由\cref{con:example}我们知道了猜想环境的使用。
+
+\begin{axiom}
+    这是一个公理。
+    \label{axi:example}
+\end{axiom}
+由\cref{axi:example}我们知道了公理环境的使用。
+
+\begin{principle}
+    这是一个定律。
+    \label{pri:example}
+\end{principle}
+由\cref{pri:example}我们知道了定律环境的使用。
+
+\begin{problem}
+    这是一个问题。
+    \label{pro:example}
+\end{problem}
+由\cref{pro:example}我们知道了问题环境的使用。
+
+\begin{example}
+    这是一个例子。
+    \label{exa:example}
+\end{example}
+由\cref{exa:example}我们知道了例子环境的使用。
+
+\begin{proof}
+    这是一个证明。
+    \label{prf:example}
+\end{proof}
+由\cref{prf:example}我们知道了证明环境的使用。
+
+\begin{solution}
+    这是一个解。
+    \label{sol:example}
+\end{solution}
+由\cref{sol:example}我们知道了解环境的使用。
+
+
+
+
+
+\end{document} 
